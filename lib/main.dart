@@ -7,49 +7,59 @@ void main() => runApp(const PerguntaApp());
 class _PerguntaAppState extends State<PerguntaApp> {
   var _questionSelected = 0;
 
-  void _responder() {
-    setState(() {
-      _questionSelected++;
-    });
+  final _questions = const [
+    {
+      'question': 'Qual é sua cor favorita?',
+      'answers': ['Azul', 'Verde', 'Preto', 'Vermelho']
+    },
+    {
+      'question': 'Qual é seu animal favorito?',
+      'answers': ['Gato', 'Cachorro', 'Ornitorrinco', 'Dragão de Komoto']
+    },
+    {
+      'question': 'Qual é sua comida preferida?',
+      'answers': ['Macarronada', 'Pizza', 'Lasanha', 'Churrasco']
+    },
+    {
+      'question': 'Qual é seu console preferido?',
+      'answers': ['PC', 'XBox', 'PlayStation', 'Nintendo']
+    },
+  ];
+
+  void _toAnswer() {
+    if (haveSelectedQuestion) {
+      setState(() {
+        _questionSelected++;
+      });
+    }
+  }
+
+  bool get haveSelectedQuestion {
+    return _questionSelected < _questions.length;
   }
 
   @override
   Widget build(BuildContext context) {
-    final questions = [
-      {
-        'question': 'Qual é sua cor favorita?',
-        'answers': ['Azul', 'Verde', 'Preto', 'Vermelho']
-      },
-      {
-        'question': 'Qual é seu animal favorito?',
-        'answers': ['Gato', 'Cachorro', 'Ornitorrinco', 'Dragão de Komoto']
-      },
-      {
-        'question': 'Qual é sua comida preferida?',
-        'answers': ['Macarronada', 'Pizza', 'Lasanha', 'Churrasco']
-      },
-      {
-        'question': 'Qual é seu console preferido?',
-        'answers': ['PC', 'XBox', 'PlayStation', 'Nintendo']
-      },
-    ];
-
-    List<Widget> answers = [];
-    for (String answer in questions[_questionSelected].cast()['answers']) {
-      answers.add(Answer(answer, _responder));
-    }
+    List<String> answers = haveSelectedQuestion
+        ? _questions[_questionSelected].cast()['answers']
+        : [];
 
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Perguntas'),
         ),
-        body: Column(
-          children: [
-            Question(questions[_questionSelected]['question'].toString()),
-            ...answers,
-          ],
-        ),
+        body: haveSelectedQuestion
+            ? Column(
+                children: [
+                  Question(
+                      _questions[_questionSelected]['question'].toString()),
+                  ...answers
+                      .map((answer) => Answer(answer, _toAnswer))
+                      .toList(),
+                ],
+              )
+            : null,
       ),
     );
   }
